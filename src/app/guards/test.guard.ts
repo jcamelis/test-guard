@@ -18,16 +18,33 @@ export class TestGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-      const dialogRef = this.dialog.open(DialogContentComponent);
-      return new Promise((resolve, reject) => {
 
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            resolve(true);
-          } else {
-            resolve(this.router.parseUrl('/no-auth'));
-          }
-        });
+
+      return new Promise((resolve, reject) => {
+        if (route.fragment?.includes('state=')) {
+          resolve(true);
+        } else {
+
+          const dialogRef = this.dialog.open(DialogContentComponent, {
+            data  : {
+              complete: (allow: boolean) => {
+                if (allow) {
+                  resolve(true);
+                } else {
+                  resolve(this.router.parseUrl('/no-auth'));
+                }
+              }
+            }
+          });
+
+          // dialogRef.afterClosed().subscribe(result => {
+          //   if (result) {
+          //     resolve(true);
+          //   } else {
+          //     resolve(this.router.parseUrl('/no-auth'));
+          //   }
+          // });
+        }
 
       });
   }
